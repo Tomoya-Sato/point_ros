@@ -34,6 +34,9 @@ class RingFilter
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
     // Functions
+
+    // Object
+    pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter_;
 };
 
 #endif
