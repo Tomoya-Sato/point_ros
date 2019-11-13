@@ -47,10 +47,10 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
     pcl::PointCloud<pcl::PointXYZI>::Ptr input_ptr(new pcl::PointCloud<pcl::PointXYZI>(cloud_array[i]));
     pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_ptr(new pcl::PointCloud<pcl::PointXYZI>());
 
-    std::cout << leafsize << " "
-    voxel_grid_filter.setLeafSize(leafsize_, leafsize_, leafsize_);
-    voxel_grid_filter.setInputCloud(input_ptr);
-    voxel_grid_filter.filter(*filtered_ptr);
+    std::cout << leafsize << " ";
+    voxel_grid_filter_.setLeafSize(leafsize, leafsize, leafsize);
+    voxel_grid_filter_.setInputCloud(input_ptr);
+    voxel_grid_filter_.filter(*filtered_ptr);
 
     output += *filtered_ptr;
     leafsize += leaf_interval;
