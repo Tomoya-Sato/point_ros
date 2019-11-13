@@ -3,7 +3,8 @@
 RingFilter::RingFilter() : nh_(), private_nh_("~")
 {
   private_nh_.param<int>("ray_number", ray_number_, 32);
-  private_nh_.param<float>("leaf_size", leafsize_, 1.5);
+  private_nh_.param<float>("max_leaf_size", max_leafsize_, 2.0);
+  private_nh_.param<float>("min_leaf_size", min_leafsize_, 0.5);
 
   filtered_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("filtered_points", 10);
   points_sub_ = nh_.subscribe("points_raw", 1, &RingFilter::pointsCallback, this);
@@ -37,19 +38,24 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
     cloud_array[item->ring].points.push_back(p);
   }
 
-  pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter;
-  voxel_grid_filter.setLeafSize(leafsize_, leafsize_, leafsize_);
+  float leafsize = min_leafsize_;
+  float leaf_interval = (max_leafsize_ - min_leafsize_) / (ray_number_ - 1);
 
+  std::cout << "Leafsize: ";
   for (int i = 0; i < ray_number_; i++)
   {
     pcl::PointCloud<pcl::PointXYZI>::Ptr input_ptr(new pcl::PointCloud<pcl::PointXYZI>(cloud_array[i]));
     pcl::PointCloud<pcl::PointXYZI>::Ptr filtered_ptr(new pcl::PointCloud<pcl::PointXYZI>());
 
+    std::cout << leafsize << " "
+    voxel_grid_filter.setLeafSize(leafsize_, leafsize_, leafsize_);
     voxel_grid_filter.setInputCloud(input_ptr);
     voxel_grid_filter.filter(*filtered_ptr);
 
     output += *filtered_ptr;
+    leafsize += leaf_interval;
   }
+  std::cout << std::endl;
 
   sensor_msgs::PointCloud2 filtered_msg;
   pcl::toROSMsg(output, filtered_msg);

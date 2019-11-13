@@ -28,7 +28,7 @@ class RingFilter
 
     // Params
     int ray_number_;
-    float leafsize_;
+    float max_leafsize_, min_leafsize_;
 
     // Callback functions
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
