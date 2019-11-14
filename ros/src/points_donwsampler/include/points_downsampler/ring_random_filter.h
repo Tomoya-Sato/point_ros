@@ -17,7 +17,7 @@ class RingRandomFilter
   public:
     RingRandomFilter();
     ~RingRandomFilter();
-    void run;
+    void run();
 
   private:
     // ROS
@@ -27,13 +27,20 @@ class RingRandomFilter
 
     // Params
     int ray_number_;
+    int points_number_;
     
     // Callback functions
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
     // Functions
-    bool orderPoints(const pcl::PointXYZI& p0, const pcl::PointXYZI& p1);
-    bool inversePoints(const pcl::PointXYZI& p0, const pcl::PointXYZI& p1);
+    static bool orderPoints(const pcl::PointXYZI& p0, const pcl::PointXYZI& p1)
+    {
+      return (p0.x < p1.x);
+    }
+    static bool inversePoints(const pcl::PointXYZI& p0, const pcl::PointXYZI& p1)
+    {
+      return (p0.x > p1.x);
+    }
 };
 
 #endif
