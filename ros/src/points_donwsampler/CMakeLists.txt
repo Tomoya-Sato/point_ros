@@ -39,3 +39,10 @@ add_executable(ring_random_filter
 )
 target_link_libraries(ring_random_filter ${catkin_LIBRARIES})
 add_dependencies(ring_random_filter ${catkin_EXPORTED_TARGETS})
+
+add_executable(distance_voxel_filter
+  nodes/distance_voxel_filter/distance_voxel_filter.cpp
+  nodes/distance_voxel_filter/distance_voxel_filter_node.cpp
+)
+target_link_libraries(distance_voxel_filter ${catkin_LIBRARIES})
+add_dependencies(distance_voxel_filter ${catkin_EXPORTED_TARGETS})
