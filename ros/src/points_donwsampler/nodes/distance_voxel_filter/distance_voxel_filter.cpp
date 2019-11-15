@@ -6,8 +6,8 @@ DistanceVoxelFilter::DistanceVoxelFilter() : nh_(), private_nh_("~")
   private_nh_.param<double>("near_leafsize", near_leafsize_, 1.0);
   private_nh_.param<double>("dist_leafsize", dist_leafsize_, 3.0);
   
-  filtered_pub_ = nh.advertise<sensor_msgs::PointCloud2>("fileter_points", 10);
-  points_sub_ = nh.subscribe("points_raw", 1, &DistanceVoxelFilter::pointsCallback, this);
+  filtered_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("filtered_points", 10);
+  points_sub_ = nh_.subscribe("points_raw", 1, &DistanceVoxelFilter::pointsCallback, this);
 }
 
 DistanceVoxelFilter::~DistanceVoxelFilter()
@@ -24,8 +24,10 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
 
   pcl::fromROSMsg(*msg, input);
 
-  pcl::PointCloud<pcl::PointXYZI>::Ptr near, dist;
-  for (pcl::PointCloud<pcl::PointXYZIR>::const_iterator item = input.begin(); item != input.end(); item++)
+  pcl::PointCloud<pcl::PointXYZI>::Ptr near(new pcl::PointCloud<pcl::PointXYZI>());
+  pcl::PointCloud<pcl::PointXYZI>::Ptr dist(new pcl::PointCloud<pcl::PointXYZI>());
+
+  for (pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::const_iterator item = input.begin(); item != input.end(); item++)
   {
     pcl::PointXYZI p;
     p.x = item->x;
@@ -43,17 +45,17 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
     }
   }
     
-  pcl::VoxelGrid<pcl::PointXYZI> voxel_gird_filter;
-  voxel_grid_filter.setLeafSize(near_leafsize, near_leafsize, near_leafsize);
+  pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter;
+  voxel_grid_filter.setLeafSize(near_leafsize_, near_leafsize_, near_leafsize_);
   voxel_grid_filter.setInputCloud(near);
   voxel_grid_filter.filter(*near);
 
-  voxel_grid_filter.setLeafSize(dist_leafsize, dist_leafsize, dist_leafsize);
+  voxel_grid_filter.setLeafSize(dist_leafsize_, dist_leafsize_, dist_leafsize_);
   voxel_grid_filter.setInputCloud(dist);
   voxel_grid_filter.filter(*dist);
 
   output += *near;
-  output += *dist
+  output += *dist;
   
   sensor_msgs::PointCloud2 filtered_msg;
   pcl::toROSMsg(output, filtered_msg);
@@ -69,5 +71,9 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
 
 void DistanceVoxelFilter::run()
 {
+  std::cout << "max_range    : " << max_range_ << std::endl;
+  std::cout << "near_leafsize: " << near_leafsize_ << std::endl;
+  std::cout << "dist_leafsize: " << dist_leafsize_ << std::endl;
+
   ros::spin();
 }

@@ -33,3 +33,5 @@ class DistanceVoxelFilter
     // Callback functinos
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
 };
+
+#endif
