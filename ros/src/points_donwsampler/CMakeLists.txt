@@ -32,3 +32,10 @@ add_executable(ring_filter
 )
 target_link_libraries(ring_filter ${catkin_LIBRARIES})
 add_dependencies(ring_filter ${catkin_EXPORTED_TARGETS})
+
+add_executable(ring_random_filter
+  nodes/ring_random_filter/ring_random_filter.cpp
+  nodes/ring_random_filter/ring_random_filter_node.cpp
+)
+target_link_libraries(ring_random_filter ${catkin_LIBRARIES})
+add_dependencies(ring_random_filter ${catkin_EXPORTED_TARGETS})
