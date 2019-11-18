@@ -21,7 +21,8 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
   pcl::PointCloud<velodyne_pointcloud::PointXYZIR> input;
   pcl::PointCloud<pcl::PointXYZI> output;
 
-  std::cout << "Duration: ";
+  std::ofstream ofs;
+  ofs.open("filter_time.csv", std::ios::app);
 
   std::chrono::time_point<std::chrono::system_clock> start, end;
   start = std::chrono::system_clock::now();
@@ -69,6 +70,9 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
 
   end = std::chrono::system_clock::now();
   double time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0;
+
+  ofs << msg->header.stamp << "," << time << std::endl;
+  ofs.close();
 
   filtered_msg.header = msg->header;
   filtered_pub_.publish(filtered_msg);

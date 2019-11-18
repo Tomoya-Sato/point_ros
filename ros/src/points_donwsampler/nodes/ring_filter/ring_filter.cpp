@@ -20,6 +20,9 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
   pcl::PointCloud<pcl::PointXYZI> output;
   pcl::PointCloud<pcl::PointXYZI> tmp;
 
+  std::ofstream ofs;
+  ofs.open("ring_filter_time.csv", std::ios::app);
+
   std::chrono::time_point<std::chrono::system_clock> start, end;
   start = std::chrono::system_clock::now();
 
@@ -60,7 +63,8 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
   end = std::chrono::system_clock::now();
   double time = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() / 1000.0;
 
-  std::cout << "Duration time: " << time << "[ms]" << "\r" << std::flush;
+  ofs << msg->header.stamp << "," << time << std::endl;
+  ofs.close();
 
   filtered_msg.header = msg->header;
   filtered_pub_.publish(filtered_msg);
