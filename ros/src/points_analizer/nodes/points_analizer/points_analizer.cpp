@@ -30,7 +30,7 @@ void PointsAnalizer::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& ms
 
   double average_distance = distance_sum / points_num;
 
-  ofs_ << msg->header.stamp << "," << average_distance << std::endl;
+  ofs_ << msg->header.stamp << "," << average_distance << "," << points_num << std::endl;
 }
 
 void PointsAnalizer::endCallback(const std_msgs::Bool msg)

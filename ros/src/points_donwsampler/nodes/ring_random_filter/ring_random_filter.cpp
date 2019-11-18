@@ -23,6 +23,8 @@ void RingRandomFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& 
 
   pcl::fromROSMsg(*msg, input);
 
+  int stride = input.size() / points_number_;
+
   std::vector<std::vector<pcl::PointCloud<pcl::PointXYZI>>> cloud_array(ray_number_, std::vector<pcl::PointCloud<pcl::PointXYZI>>(4));
 
   for (pcl::PointCloud<velodyne_pointcloud::PointXYZIR>::const_iterator item = input.begin(); item != input.end(); item++)
@@ -56,7 +58,16 @@ void RingRandomFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& 
 
   for (int i = 0; i < ray_number_; i++)
   {
-    output += cloud_array[i][0];
+    for (pcl::PointCloud<pcl::PointXYZI>::const_iterator item = cloud_array[i][0].begin(); item < cloud_array[i][0].end(); item+=stride)
+    {
+      pcl::PointXYZI q;
+      q.x = item->x;
+      q.y = item->y;
+      q.z = item->z;
+      q.intensity = item->intensity;
+
+      output.points.push_back(q);
+    }
   }
 
   sensor_msgs::PointCloud2 filtered_msg;
@@ -73,5 +84,7 @@ void RingRandomFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& 
 
 void RingRandomFilter::run()
 {
+  std::cout << "ray_number   : " << ray_number_ << std::endl;
+  std::cout << "points_number: " << points_number_ << std::endl;
   ros::spin();
 }
