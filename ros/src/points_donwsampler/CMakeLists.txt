@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(points_downsampler)
 
-find_package(PCL REQUIRED)
+set(CMAKE_CXX_FLAGS "-O2 -g -Wall ${CMAKE_CXX_FLAGS}")
 
 # Enable support for c++11
 if (${CMAKE_VERSION} VERSION_LESS "3.1.0")
@@ -18,7 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
   velodyne_pointcloud
 )
 
-catkin_package(DEPENDS PCL)
+catkin_package()
+
 
 ###########
 ## Build ##

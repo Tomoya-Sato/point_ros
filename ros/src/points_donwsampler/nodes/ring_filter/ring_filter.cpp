@@ -66,6 +66,8 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
   ofs << msg->header.stamp << "," << time << std::endl;
   ofs.close();
 
+  std::cout << "Duration: " << time << "\r" << std::flush;
+
   filtered_msg.header = msg->header;
   filtered_pub_.publish(filtered_msg);
 }
