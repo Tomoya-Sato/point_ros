@@ -1,22 +1,21 @@
-#ifndef RING_FILTER_H
-#define RING_FILTER_H
+#ifndef VOXEL_GRID_FILTER_H
+#define VOXEL_GRID_FILTER_H
 
 #include <iostream>
-#include <vector>
 #include <chrono>
 
 #include <sensor_msgs/PointCloud2.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/kdtree/kdtree_flann.h>
 
-#include <velodyne_pointcloud/point_types.h>
-
-class RingFilter
+class VoxelGridFilter
 {
   public:
-    RingFilter();
-    ~RingFilter();
+    VoxelGridFilter();
+    ~VoxelGridFilter();
     void run();
 
   private:
@@ -25,14 +24,14 @@ class RingFilter
     ros::Publisher filtered_pub_;
     ros::Subscriber points_sub_;
 
+    ros::Publisher app_pub_;
+
     // Params
-    int ray_number_;
-    float max_leafsize_, min_leafsize_;
+    double leafsize_;
+    int method_;
 
-    // Callback functions
+    // Callback funcitons
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
-
-    // Functions
 };
 
 #endif
