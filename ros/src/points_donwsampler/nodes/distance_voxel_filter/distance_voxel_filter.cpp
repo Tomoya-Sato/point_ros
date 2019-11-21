@@ -1,6 +1,6 @@
 #include "points_downsampler/distance_voxel_filter.h"
 
-// #include "voxel_grid_approxi.h"
+#include "voxel_grid_approxi.h"
 
 DistanceVoxelFilter::DistanceVoxelFilter() : nh_(), private_nh_("~")
 {
@@ -20,6 +20,8 @@ void DistanceVoxelFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPt
 {
   pcl::PointCloud<pcl::PointXYZI> input;
   pcl::PointCloud<pcl::PointXYZI> output;
+
+  pcl::VoxelGridApproxi<pcl::PointXYZI> voxel_grid_filter_;
 
   std::ofstream ofs;
   ofs.open("filter_time.csv", std::ios::app);

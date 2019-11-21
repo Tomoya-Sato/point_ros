@@ -1,5 +1,7 @@
 #include "points_downsampler/ring_filter.h"
 
+#include "voxel_grid_approxi.h"
+
 RingFilter::RingFilter() : nh_(), private_nh_("~")
 {
   private_nh_.param<int>("ray_number", ray_number_, 32);
@@ -19,6 +21,8 @@ void RingFilter::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg)
   pcl::PointCloud<velodyne_pointcloud::PointXYZIR> input;
   pcl::PointCloud<pcl::PointXYZI> output;
   pcl::PointCloud<pcl::PointXYZI> tmp;
+
+  pcl::VoxelGridApproxi<pcl::PointXYZI> voxel_grid_filter_;
 
   std::ofstream ofs;
   ofs.open("ring_filter_time.csv", std::ios::app);

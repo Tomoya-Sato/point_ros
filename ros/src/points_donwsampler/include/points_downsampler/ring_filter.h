@@ -9,7 +9,6 @@
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
-#include <pcl/filters/voxel_grid.h>
 
 #include <velodyne_pointcloud/point_types.h>
 
@@ -34,9 +33,6 @@ class RingFilter
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
 
     // Functions
-
-    // Object
-    pcl::VoxelGrid<pcl::PointXYZI> voxel_grid_filter_;
 };
 
 #endif

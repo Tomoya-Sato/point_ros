@@ -30,6 +30,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 add_executable(ring_filter
   nodes/ring_filter/ring_filter.cpp
   nodes/ring_filter/ring_filter_node.cpp
+  nodes/ring_filter/voxel_grid_approxi.cpp
 )
 target_link_libraries(ring_filter ${catkin_LIBRARIES})
 add_dependencies(ring_filter ${catkin_EXPORTED_TARGETS})
@@ -48,3 +49,19 @@ add_executable(distance_voxel_filter
 )
 target_link_libraries(distance_voxel_filter ${catkin_LIBRARIES})
 add_dependencies(distance_voxel_filter ${catkin_EXPORTED_TARGETS})
+
+
+add_executable(voxel_grid_filter
+  nodes/voxel_grid_filter/voxel_grid_filter.cpp
+  nodes/voxel_grid_filter/voxel_grid_filter_node.cpp
+  nodes/voxel_grid_filter/voxel_grid_approxi.cpp
+)
+target_link_libraries(voxel_grid_filter ${catkin_LIBRARIES})
+add_dependencies(voxel_grid_filter ${catkin_EXPORTED_TARGETS})
+
+add_executable(random_filter
+  nodes/random_filter/random_filter.cpp
+  nodes/random_filter/random_filter_node.cpp
+)
+target_link_libraries(random_filter ${catkin_LIBRARIES})
+add_dependencies(random_filter ${catkin_EXPORTED_TARGETS})

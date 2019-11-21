@@ -1,23 +1,19 @@
-#ifndef DISTANCE_VOXEL_FILTER_H
-#define DISTNACE_VOXEL_FILTER_H
+#ifndef RANDOM_FILTER_H
+#define RANDOM_FILTER_H
 
 #include <iostream>
-#include <vector>
 #include <chrono>
 
 #include <sensor_msgs/PointCloud2.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
-#include <pcl/filters/voxel_grid.h>
 
-#include <velodyne_pointcloud/point_types.h>
-
-class DistanceVoxelFilter
+class RandomFilter
 {
   public:
-    DistanceVoxelFilter();
-    ~DistanceVoxelFilter();
+    RandomFilter();
+    ~RandomFilter();
     void run();
 
   private:
@@ -27,10 +23,9 @@ class DistanceVoxelFilter
     ros::Subscriber points_sub_;
 
     // Params
-    double max_range_;
-    double near_leafsize_, dist_leafsize_;
+    int points_number_;
 
-    // Callback functinos
+    // Callback functions
     void pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& msg);
 };
 
