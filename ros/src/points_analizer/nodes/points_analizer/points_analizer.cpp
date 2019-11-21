@@ -18,6 +18,11 @@ void PointsAnalizer::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& ms
   pcl::PointCloud<pcl::PointXYZ> input;
   pcl::fromROSMsg(*msg, input);
 
+  std::ofstream dis_ofs;
+  dis_ofs.open("distance_distribution.csv", std::ios::app);
+
+  std::vector<int> distribution(20, 0);
+
   double distance_sum = 0.0;
   int points_num = 0;
 
@@ -26,11 +31,24 @@ void PointsAnalizer::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& ms
     double distance = std::sqrt(item->x * item->x + item->y * item->y + item->z * item->z);
     distance_sum += distance;
     points_num++;
+
+    if (distance < 200)
+    {
+      distribution[distance / 10] += 1;
+    }
   }
 
   double average_distance = distance_sum / points_num;
 
   ofs_ << msg->header.stamp << "," << average_distance << "," << points_num << std::endl;
+
+  dis_ofs << msg->header.stamp << ",";
+  for (int i = 0; i < 20; i++)
+  {
+    dis_ofs << distribution[i] << ",";
+  }
+  dis_ofs << std::endl;
+  dis_ofs.close();
 }
 
 void PointsAnalizer::endCallback(const std_msgs::Bool msg)
