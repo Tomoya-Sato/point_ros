@@ -34,19 +34,21 @@ void PointsAnalizer::pointsCallback(const sensor_msgs::PointCloud2::ConstPtr& ms
 
     if (distance < 200)
     {
-      distribution[distance / 10] += 1
+      distribution[distance / 10] += 1;
     }
   }
 
   double average_distance = distance_sum / points_num;
 
   ofs_ << msg->header.stamp << "," << average_distance << "," << points_num << std::endl;
+
+  dis_ofs << msg->header.stamp << ",";
   for (int i = 0; i < 20; i++)
   {
     dis_ofs << distribution[i] << ",";
   }
   dis_ofs << std::endl;
-  dis_ofs << close();
+  dis_ofs.close();
 }
 
 void PointsAnalizer::endCallback(const std_msgs::Bool msg)
