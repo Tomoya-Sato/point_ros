@@ -27,6 +27,16 @@ int main(int argc, char **argv)
   rosbag::Bag out_bag;
   out_bag.open(output, rosbag::bagmode::Write);
 
+  Eigen::Matrix4f Tr;
+
+  Tr << 0.000427680238554, -0.9999672484946, -0.008084491683471, -0.01198459927713,
+        -0.007210626507497, 0.008081198471645, -0.9999413164504, -0.05403984729748,
+        0.9999738645903, 0.0004859485810390, -0.007206933692422, -0.2921968648686,
+        0.0, 0.0, 0.0, 1.0;
+
+  std::cout << "Transform: " << std::endl;
+  std::cout << Tr << std::endl;
+
   char filename[64];
   for (int i = 0; i < total; i++)
   {
@@ -36,7 +46,7 @@ int main(int argc, char **argv)
     std::cout << "Reading: " << filename;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr output(new pcl::PointCloud<pcl::PointXYZI>());
-    pcl::PointXYZI p;
+    pcl::PointXYZI p, q;
 
     while (!ifs.eof())
     {
@@ -45,7 +55,12 @@ int main(int argc, char **argv)
       ifs.read((char*)&p.z, sizeof(float));
       ifs.read((char*)&p.intensity, sizeof(float));
 
-      output->points.push_back(p);
+      q.x = Tr(0, 0) * p.x + Tr(0, 1) * p.y + Tr(0, 2) * p.z + Tr(0, 3);
+      q.y = Tr(1, 0) * p.x + Tr(1, 1) * p.y + Tr(1, 2) * p.z + Tr(1, 3);
+      q.z = Tr(2, 0) * p.x + Tr(2, 1) * p.y + Tr(2, 2) * p.z + Tr(2, 3);
+      q.intensity = p.intensity;
+      
+      output->points.push_back(q);
     }
 
     std::cout << ", points_size: " << output->size() << std::endl;
