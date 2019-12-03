@@ -11,70 +11,83 @@
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "velodyne2rosbag");
-  ros::NodeHandle nh;
+  ros::init(argc, argv, "velodyne2bag");
+  ros::NodeHandle n;
+
+  if (argc != 5)
+  {
+    std::cerr << "Invalid Arguments!" << std::endl;
+    std::cerr << "velodyne2bag $DATA_BASE_DIR $FILE_NUM $STAMP_FILE $OUTPUT_BAG" << std::endl;
+
+    return -1;
+  }
 
   std::string base_dir(argv[1]);
   int total = atoi(argv[2]);
-  std::string output(argv[3]);
-  std::ifstream ifs;
+  std::string stamp_file(argv[3]);
+  std::string bag_name(argv[4]);
+  std::ifstream data_ifs;
+  std::ifstream stamp_ifs;
 
-  ros::Time base;
-  base = ros::Time::now();
+  std::cout << "############" << std::endl
+            << "## Config ##" << std::endl
+            << "############" << std::endl;
 
-  ros::Duration time_step(0.1);
+  std::cout << "DATA BASE DIR: " << base_dir << std::endl;
+  std::cout << "TOTAL FILE NUBMER: " << total << std::endl;
+  std::cout << "STAMP FILE: " << stamp_file << std::endl;
+  std::cout << "OUTPUT BAG FILE: " << bag_name << std::endl;
+  std::cout << std::endl;
 
   rosbag::Bag out_bag;
-  out_bag.open(output, rosbag::bagmode::Write);
+  out_bag.open(bag_name, rosbag::bagmode::Write);
 
-  Eigen::Matrix4f Tr;
+  stamp_ifs.open(stamp_file, std::ios::in);
 
-  Tr << 0.000427680238554, -0.9999672484946, -0.008084491683471, -0.01198459927713,
-        -0.007210626507497, 0.008081198471645, -0.9999413164504, -0.05403984729748,
-        0.9999738645903, 0.0004859485810390, -0.007206933692422, -0.2921968648686,
-        0.0, 0.0, 0.0, 1.0;
+  ros::Time base_stamp = ros::Time::now();
 
-  std::cout << "Transform: " << std::endl;
-  std::cout << Tr << std::endl;
-
-  char filename[64];
+  char filename[1024];
   for (int i = 0; i < total; i++)
   {
     sprintf(filename, "%s/%06d.bin", base_dir.c_str(), i);
-    ifs.open(filename, std::ios::in | std::ios::binary);
+    data_ifs.open(filename, std::ios::in | std::ios::binary);
 
     std::cout << "Reading: " << filename;
 
     pcl::PointCloud<pcl::PointXYZI>::Ptr output(new pcl::PointCloud<pcl::PointXYZI>());
-    pcl::PointXYZI p, q;
+    pcl::PointXYZI p;
 
-    while (!ifs.eof())
+    while (!data_ifs.eof())
     {
-      ifs.read((char*)&p.x, sizeof(float));
-      ifs.read((char*)&p.y, sizeof(float));
-      ifs.read((char*)&p.z, sizeof(float));
-      ifs.read((char*)&p.intensity, sizeof(float));
+      data_ifs.read((char*)&p.x, sizeof(float));
+      data_ifs.read((char*)&p.y, sizeof(float));
+      data_ifs.read((char*)&p.z, sizeof(float));
+      data_ifs.read((char*)&p.intensity, sizeof(float));
 
-      q.x = Tr(0, 0) * p.x + Tr(0, 1) * p.y + Tr(0, 2) * p.z + Tr(0, 3);
-      q.y = Tr(1, 0) * p.x + Tr(1, 1) * p.y + Tr(1, 2) * p.z + Tr(1, 3);
-      q.z = Tr(2, 0) * p.x + Tr(2, 1) * p.y + Tr(2, 2) * p.z + Tr(2, 3);
-      q.intensity = p.intensity;
-      
-      output->points.push_back(q);
+      output->points.push_back(p);
     }
 
-    std::cout << ", points_size: " << output->size() << std::endl;
+    std::cout << ", points_size: " << output->size();
+
+    std::string stamp_tmp;
+    std::getline(stamp_ifs, stamp_tmp);
+    std::cout << stamp_tmp << std::endl; //debug
+    double d_stamp = std::stod(stamp_tmp);
+    ros::Duration stamp_duration(d_stamp);
+    ros::Time ros_stamp = base_stamp + stamp_duration;
+
+    // Debug section
+    std::cout << " [" << d_stamp << "]" << std::endl;
 
     sensor_msgs::PointCloud2 msg;
     pcl::toROSMsg(*output, msg);
-    msg.header.stamp = base;
+    msg.header.stamp = ros_stamp;
     msg.header.frame_id = "velodyne";
     msg.header.seq = i;
 
-    out_bag.write("/points_raw", base, msg);
+    out_bag.write("/points_raw", ros_stamp, msg);
 
-    base = base + time_step;
-    ifs.close();
+    data_ifs.close();
     output->clear();
   }
 
