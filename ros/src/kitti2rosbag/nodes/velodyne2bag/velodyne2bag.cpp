@@ -71,12 +71,10 @@ int main(int argc, char **argv)
 
     std::string stamp_tmp;
     std::getline(stamp_ifs, stamp_tmp);
-    std::cout << stamp_tmp << std::endl; //debug
     double d_stamp = std::stod(stamp_tmp);
     ros::Duration stamp_duration(d_stamp);
     ros::Time ros_stamp = base_stamp + stamp_duration;
 
-    // Debug section
     std::cout << " [" << d_stamp << "]" << std::endl;
 
     sensor_msgs::PointCloud2 msg;
